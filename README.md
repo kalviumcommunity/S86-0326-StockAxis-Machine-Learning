@@ -37,20 +37,51 @@ project_root/
 
 ## Setup
 
-1. Create and activate a Python environment.
-2. Install dependencies:
+1. Create a virtual environment inside the project:
+
+```bash
+python -m venv .venv
+```
+
+2. Activate the environment.
+
+Windows (PowerShell):
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+macOS/Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+3. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Place your dataset at:
+4. (Optional) verify installed packages:
+
+```bash
+pip list
+```
+
+5. Place your dataset at:
 
 ```text
 data/raw/dataset.csv
 ```
 
-4. Ensure your dataset includes a target column matching `target_column` in `src/config.py` (default: `target`).
+6. Ensure your dataset includes a target column matching `target_column` in `src/config.py` (default: `target`).
+
+7. Deactivate the environment when finished:
+
+```bash
+deactivate
+```
 
 ## Run Pipeline
 
@@ -73,6 +104,7 @@ After execution, the pipeline writes:
 - Randomness is controlled by `random_state` in `src/config.py`.
 - Core logic functions return values instead of printing, enabling easier testing and reuse.
 - Imports are explicit and modular to support maintainability and collaboration.
+- Virtual environment folders are ignored via `.gitignore` to keep machine-specific files out of version control.
 
 ## Structuring Python Files and Modules Milestone
 
