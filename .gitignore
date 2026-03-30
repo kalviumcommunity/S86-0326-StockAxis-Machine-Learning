@@ -1,0 +1,18 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Local environment variables
+.env
+
+# OS/editor artifacts
+.DS_Store
+Thumbs.db
+.vscode/
