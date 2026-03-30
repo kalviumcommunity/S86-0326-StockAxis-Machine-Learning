@@ -73,3 +73,15 @@ After execution, the pipeline writes:
 - Randomness is controlled by `random_state` in `src/config.py`.
 - Core logic functions return values instead of printing, enabling easier testing and reuse.
 - Imports are explicit and modular to support maintainability and collaboration.
+
+## Structuring Python Files and Modules Milestone
+
+This branch demonstrates the refactor from script-style ML code to a modular package layout. The workflow is separated into focused modules for preprocessing, feature engineering, training, evaluation, and prediction.
+
+### Reviewer Checklist
+
+- Source code is organized under the `src/` package with one responsibility per module.
+- `main.py` orchestrates execution while reusable logic stays inside module functions.
+- Configuration is centralized in `src/config.py`.
+- Training and prediction responsibilities are separated across `src/train.py` and `src/predict.py`.
+- Dependencies are pinned in `requirements.txt`.
