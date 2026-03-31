@@ -37,6 +37,11 @@ project_root/
 
 ## Setup
 
+Python version: **3.10**
+
+This project uses exact dependency pinning in `requirements.txt` to keep training, evaluation,
+and model serialization behavior reproducible across machines.
+
 1. Create a virtual environment inside the project:
 
 ```bash
@@ -63,10 +68,10 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. (Optional) verify installed packages:
+4. Verify that pinned versions are installed:
 
 ```bash
-pip list
+pip freeze
 ```
 
 5. Place your dataset at:
@@ -82,6 +87,31 @@ data/raw/dataset.csv
 ```bash
 deactivate
 ```
+
+## Dependency Management
+
+Dependencies are tracked in `requirements.txt` and pinned with `==`.
+
+Current direct dependencies:
+
+- `joblib==1.4.2`
+- `numpy==2.2.4`
+- `pandas==2.2.3`
+- `scikit-learn==1.6.1`
+
+Install from the file with:
+
+```bash
+pip install -r requirements.txt
+```
+
+If dependencies change, update `requirements.txt` in the same commit.
+For sprint-grade reproducibility, rebuild from a clean environment before submission:
+
+1. Delete `.venv`
+2. Recreate and activate virtual environment
+3. Run `pip install -r requirements.txt`
+4. Run `python main.py`
 
 ## Run Pipeline
 
@@ -102,6 +132,7 @@ After execution, the pipeline writes:
 ## Notes for Reproducibility
 
 - Randomness is controlled by `random_state` in `src/config.py`.
+- Python version is fixed to 3.10 and package versions are pinned in `requirements.txt`.
 - Core logic functions return values instead of printing, enabling easier testing and reuse.
 - Imports are explicit and modular to support maintainability and collaboration.
 - Virtual environment folders are ignored via `.gitignore` to keep machine-specific files out of version control.
