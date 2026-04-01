@@ -17,6 +17,7 @@ project_root/
 |-- src/
 |   |-- __init__.py
 |   |-- config.py
+|   |-- data_loader.py
 |   |-- data_preprocessing.py
 |   |-- feature_engineering.py
 |   |-- train.py
@@ -31,7 +32,8 @@ project_root/
 ## Modules
 
 - `src/config.py`: Centralized configuration for paths, columns, model params, and reproducibility.
-- `src/data_preprocessing.py`: Data loading, cleaning, and train-test split functions.
+- `src/data_loader.py`: Raw data loading and file-level input validation.
+- `src/data_preprocessing.py`: Cleaning and train-test split functions.
 - `src/feature_engineering.py`: Feature inference, derived features, and preprocessing pipeline setup.
 - `src/train.py`: Model training function with explicit parameters.
 - `src/evaluate.py`: Model evaluation function returning a metrics dictionary.
@@ -54,6 +56,13 @@ Training flow:
 Prediction flow:
 
 `new data -> load artifacts -> transform -> predict`
+
+## Responsibility Boundaries
+
+- Data loading is isolated in `src/data_loader.py` and does not split, fit, or engineer features.
+- Training logic (including fitting preprocessors and models) runs in the orchestration pipeline.
+- Inference logic in `src/predict.py` only applies learned transformations and predicts.
+- Artifact save/load is isolated in `src/persistence.py`.
 
 ## Setup
 
