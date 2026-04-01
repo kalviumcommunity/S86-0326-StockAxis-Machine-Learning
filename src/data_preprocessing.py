@@ -1,24 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import pandas as pd
 from sklearn.model_selection import train_test_split
-
-
-def load_data(filepath: str | Path) -> pd.DataFrame:
-    """Load raw data from a CSV file.
-
-    Parameters:
-        filepath: Path to the CSV file.
-
-    Returns:
-        Loaded pandas DataFrame.
-    """
-    path = Path(filepath)
-    if not path.exists():
-        raise FileNotFoundError(f"Data file not found: {path}")
-    return pd.read_csv(path)
 
 
 def clean_data(df: pd.DataFrame, drop_duplicates: bool = True) -> pd.DataFrame:

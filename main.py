@@ -3,7 +3,8 @@ from __future__ import annotations
 import json
 
 from src.config import Config
-from src.data_preprocessing import clean_data, load_data, split_data
+from src.data_loader import load_data
+from src.data_preprocessing import clean_data, split_data
 from src.evaluate import evaluate_model
 from src.feature_engineering import (
     add_derived_features,
