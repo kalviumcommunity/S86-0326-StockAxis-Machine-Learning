@@ -45,6 +45,7 @@ class Config:
         directories = [
             self.resolve_path(Path("data/raw")),
             self.resolve_path(Path("data/processed")),
+            self.resolve_path(Path("data/external")),
             self.resolve_path(Path("models")),
             self.resolve_path(Path("reports")),
             self.resolve_path(Path("logs")),

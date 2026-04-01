@@ -12,7 +12,8 @@ from src.feature_engineering import (
     infer_feature_columns,
     transform_features,
 )
-from src.predict import predict_new_data, save_artifacts
+from src.persistence import save_artifacts
+from src.predict import predict_new_data
 from src.train import train_model
 
 

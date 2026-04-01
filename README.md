@@ -8,7 +8,9 @@ Refactored machine learning workflow into modular, reusable Python functions acr
 project_root/
 |-- data/
 |   |-- raw/
-|   `-- processed/
+|   |-- processed/
+|   `-- external/
+|-- notebooks/
 |-- models/
 |-- reports/
 |-- logs/
@@ -19,7 +21,8 @@ project_root/
 |   |-- feature_engineering.py
 |   |-- train.py
 |   |-- evaluate.py
-|   `-- predict.py
+|   |-- predict.py
+|   `-- persistence.py
 |-- main.py
 |-- requirements.txt
 `-- README.md
@@ -32,8 +35,25 @@ project_root/
 - `src/feature_engineering.py`: Feature inference, derived features, and preprocessing pipeline setup.
 - `src/train.py`: Model training function with explicit parameters.
 - `src/evaluate.py`: Model evaluation function returning a metrics dictionary.
-- `src/predict.py`: Artifact save/load and prediction on new data.
+- `src/predict.py`: Prediction on new data using already-fitted artifacts.
+- `src/persistence.py`: Centralized save/load functions for model and preprocessing artifacts.
 - `main.py`: Orchestration script that executes the full training workflow in sequence.
+
+## Data Responsibility Rules
+
+- `data/raw/` stores original source-of-truth files and should remain unchanged.
+- `data/processed/` stores reproducible outputs from preprocessing and feature steps.
+- `data/external/` stores third-party or reference datasets.
+
+## Pipeline Separation
+
+Training flow:
+
+`raw data -> preprocessing -> feature engineering -> fit model -> save artifacts -> evaluate`
+
+Prediction flow:
+
+`new data -> load artifacts -> transform -> predict`
 
 ## Setup
 
