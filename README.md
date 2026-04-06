@@ -167,6 +167,7 @@ After execution, the pipeline writes:
 - `PROBLEM_DEFINITION.md`
 - `PROBLEM_TYPE_REFERENCE_GUIDE.md`
 - `DATA_SPLITTING_GUIDE.md`
+- `notebooks/understanding_data_leakage_simple_examples.ipynb`
 
 ## Notes for Reproducibility
 
