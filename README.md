@@ -33,7 +33,7 @@ project_root/
 
 - `src/config.py`: Centralized configuration for paths, columns, model params, and reproducibility.
 - `src/data_loader.py`: Raw data loading and file-level input validation.
-- `src/data_preprocessing.py`: Cleaning and train-test split functions.
+- `src/data_preprocessing.py`: Cleaning plus train-test split helpers (standard, stratified, and time-based).
 - `src/feature_engineering.py`: Feature inference, derived features, and preprocessing pipeline setup.
 - `src/train.py`: Model training function with explicit parameters.
 - `src/evaluate.py`: Model evaluation function returning a metrics dictionary.
@@ -157,6 +157,16 @@ After execution, the pipeline writes:
 - `models/preprocessing_pipeline.joblib`
 - `reports/metrics.json`
 - `reports/predictions.csv`
+
+## Learning Guides
+
+- `FEATURE_TARGET_DEFINITION_GUIDE.md`
+- `FEATURE_TARGET_IMPLEMENTATION.md`
+- `FEATURE_DISTRIBUTIONS_QUICK_REFERENCE.md`
+- `FEATURE_DISTRIBUTION_IMPLEMENTATION.md`
+- `PROBLEM_DEFINITION.md`
+- `PROBLEM_TYPE_REFERENCE_GUIDE.md`
+- `DATA_SPLITTING_GUIDE.md`
 
 ## Notes for Reproducibility
 
