@@ -168,6 +168,7 @@ After execution, the pipeline writes:
 - `PROBLEM_TYPE_REFERENCE_GUIDE.md`
 - `DATA_SPLITTING_GUIDE.md`
 - `notebooks/understanding_data_leakage_simple_examples.ipynb`
+- `notebooks/selecting_numerical_and_categorical_features.ipynb`
 
 ## Notes for Reproducibility
 
