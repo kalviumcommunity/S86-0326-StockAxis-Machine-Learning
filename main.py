@@ -51,7 +51,7 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
     preprocessor = build_preprocessing_pipeline(
         categorical_cols=categorical_cols,
         numerical_cols=numerical_cols,
-        scale_numerical=config.scale_numerical_features,
+        numerical_scaler=config.numerical_scaler,
     )
     fitted_preprocessor = fit_preprocessor(preprocessor, X_train)
 

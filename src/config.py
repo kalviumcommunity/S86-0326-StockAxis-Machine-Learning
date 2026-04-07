@@ -33,7 +33,7 @@ class Config:
     categorical_columns: list[str] = field(default_factory=list)
     numerical_columns: list[str] = field(default_factory=list)
     drop_columns: list[str] = field(default_factory=list)
-    scale_numerical_features: bool = True
+    numerical_scaler: str = "minmax"
 
     def resolve_path(self, path_like: Path) -> Path:
         """Resolve project-relative paths to absolute paths."""
