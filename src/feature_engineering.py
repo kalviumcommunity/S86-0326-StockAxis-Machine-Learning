@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import MinMaxScaler, OneHotEncoder, StandardScaler
 
 
 def add_derived_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -65,13 +65,15 @@ def infer_feature_columns(
 def build_preprocessing_pipeline(
     categorical_cols: Sequence[str],
     numerical_cols: Sequence[str],
-    scale_numerical: bool = True,
+    numerical_scaler: str = "standard",
 ) -> ColumnTransformer:
     """Build sklearn preprocessing pipeline for categorical and numerical features.
 
     Parameters:
         categorical_cols: Categorical feature names.
         numerical_cols: Numerical feature names.
+        numerical_scaler: Scaling strategy for numeric features.
+            Supported values: "standard", "minmax", "none".
 
     Returns:
         A configured sklearn ColumnTransformer.
@@ -79,14 +81,24 @@ def build_preprocessing_pipeline(
     if not categorical_cols and not numerical_cols:
         raise ValueError("At least one categorical or numerical column is required.")
 
+    allowed_scalers = {"standard", "minmax", "none"}
+    if numerical_scaler not in allowed_scalers:
+        raise ValueError(
+            f"Unsupported numerical_scaler '{numerical_scaler}'. "
+            f"Use one of {sorted(allowed_scalers)}."
+        )
+
     transformers: list[tuple[str, Pipeline, list[str]]] = []
 
     if numerical_cols:
         numeric_steps: list[tuple[str, object]] = [
             ("imputer", SimpleImputer(strategy="median")),
         ]
-        if scale_numerical:
+
+        if numerical_scaler == "standard":
             numeric_steps.append(("scaler", StandardScaler()))
+        elif numerical_scaler == "minmax":
+            numeric_steps.append(("scaler", MinMaxScaler()))
 
         numeric_pipeline = Pipeline(steps=numeric_steps)
         transformers.append(("num", numeric_pipeline, list(numerical_cols)))
