@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 
+from src.baseline import evaluate_classification_baseline
 from src.config import Config
 from src.data_loader import load_data
 from src.data_preprocessing import clean_data, split_data
@@ -65,7 +66,27 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
         model_params=config.model_params,
     )
 
-    metrics = evaluate_model(model=model, X_test=X_test_processed, y_test=y_test)
+    baseline_metrics = evaluate_classification_baseline(
+        X_train=X_train_processed,
+        y_train=y_train,
+        X_test=X_test_processed,
+        y_test=y_test,
+        strategy=config.baseline_strategy,
+        random_state=config.random_state,
+    )
+
+    model_metrics = evaluate_model(model=model, X_test=X_test_processed, y_test=y_test)
+
+    metrics: dict[str, float] = {}
+    for metric_name, metric_value in baseline_metrics.items():
+        metrics[f"baseline_{metric_name}"] = float(metric_value)
+
+    for metric_name, metric_value in model_metrics.items():
+        metrics[f"model_{metric_name}"] = float(metric_value)
+
+    for metric_name, metric_value in model_metrics.items():
+        if metric_name in baseline_metrics:
+            metrics[f"improvement_{metric_name}"] = float(metric_value - baseline_metrics[metric_name])
 
     save_artifacts(model=model, pipeline=fitted_preprocessor, model_path=model_path, pipeline_path=pipeline_path)
 
