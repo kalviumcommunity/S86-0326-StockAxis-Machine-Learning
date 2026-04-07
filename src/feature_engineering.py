@@ -65,6 +65,7 @@ def infer_feature_columns(
 def build_preprocessing_pipeline(
     categorical_cols: Sequence[str],
     numerical_cols: Sequence[str],
+    scale_numerical: bool = True,
 ) -> ColumnTransformer:
     """Build sklearn preprocessing pipeline for categorical and numerical features.
 
@@ -81,12 +82,13 @@ def build_preprocessing_pipeline(
     transformers: list[tuple[str, Pipeline, list[str]]] = []
 
     if numerical_cols:
-        numeric_pipeline = Pipeline(
-            steps=[
-                ("imputer", SimpleImputer(strategy="median")),
-                ("scaler", StandardScaler()),
-            ]
-        )
+        numeric_steps: list[tuple[str, object]] = [
+            ("imputer", SimpleImputer(strategy="median")),
+        ]
+        if scale_numerical:
+            numeric_steps.append(("scaler", StandardScaler()))
+
+        numeric_pipeline = Pipeline(steps=numeric_steps)
         transformers.append(("num", numeric_pipeline, list(numerical_cols)))
 
     if categorical_cols:
