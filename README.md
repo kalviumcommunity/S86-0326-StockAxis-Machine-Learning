@@ -169,6 +169,7 @@ After execution, the pipeline writes:
 - `DATA_SPLITTING_GUIDE.md`
 - `SCALING_NUMERICAL_FEATURES_GUIDE.md`
 - `MINMAX_NORMALIZATION_GUIDE.md`
+- `BASELINE_MODEL_GUIDE.md`
 - `notebooks/understanding_data_leakage_simple_examples.ipynb`
 - `notebooks/selecting_numerical_and_categorical_features.ipynb`
 

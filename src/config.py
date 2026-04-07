@@ -34,6 +34,7 @@ class Config:
     numerical_columns: list[str] = field(default_factory=list)
     drop_columns: list[str] = field(default_factory=list)
     numerical_scaler: str = "minmax"
+    baseline_strategy: str = "most_frequent"
 
     def resolve_path(self, path_like: Path) -> Path:
         """Resolve project-relative paths to absolute paths."""
