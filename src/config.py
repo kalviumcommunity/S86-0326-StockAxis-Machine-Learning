@@ -17,6 +17,7 @@ class Config:
     metrics_path: Path = field(default_factory=lambda: Path("reports/metrics.json"))
     predictions_path: Path = field(default_factory=lambda: Path("reports/predictions.csv"))
     coefficients_path: Path = field(default_factory=lambda: Path("reports/coefficients.csv"))
+    residuals_path: Path = field(default_factory=lambda: Path("reports/residuals.csv"))
 
     target_column: str = "target"
     test_size: float = 0.2

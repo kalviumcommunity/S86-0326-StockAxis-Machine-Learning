@@ -35,6 +35,7 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
     metrics_path = config.resolve_path(config.metrics_path)
     predictions_path = config.resolve_path(config.predictions_path)
     coefficients_path = config.resolve_path(config.coefficients_path)
+    residuals_path = config.resolve_path(config.residuals_path)
 
     df_raw = load_data(raw_data_path)
     df_clean = clean_data(df_raw)
@@ -82,6 +83,7 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
     )
 
     model_metrics = evaluate_model(model=model, X_test=X_test_processed, y_test=y_test)
+    model_predictions = model.predict(X_test_processed)
 
     metrics: dict[str, float] = {}
     for metric_name, metric_value in baseline_metrics.items():
@@ -89,6 +91,11 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
 
     for metric_name, metric_value in model_metrics.items():
         metrics[f"model_{metric_name}"] = float(metric_value)
+
+    mean_target = float(y_test.mean())
+    if mean_target != 0:
+        metrics["model_mae_pct_of_mean_target"] = float((model_metrics["mae"] / abs(mean_target)) * 100)
+        metrics["baseline_mae_pct_of_mean_target"] = float((baseline_metrics["mae"] / abs(mean_target)) * 100)
 
     lower_is_better = {"mse", "rmse", "mae"}
     higher_is_better = {"r2"}
@@ -118,6 +125,19 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
     for fold_index, fold_score in enumerate(cv_r2_scores, start=1):
         metrics[f"cv_r2_fold_{fold_index}"] = float(fold_score)
 
+    cv_neg_mae_scores = cross_val_score(
+        cv_pipeline,
+        X_train,
+        y_train,
+        cv=config.cv_folds,
+        scoring="neg_mean_absolute_error",
+    )
+    cv_mae_scores = -cv_neg_mae_scores
+    metrics["cv_mae_mean"] = float(cv_mae_scores.mean())
+    metrics["cv_mae_std"] = float(cv_mae_scores.std())
+    for fold_index, fold_score in enumerate(cv_mae_scores, start=1):
+        metrics[f"cv_mae_fold_{fold_index}"] = float(fold_score)
+
     feature_names = fitted_preprocessor.get_feature_names_out()
     coefficients = pd.DataFrame(
         {
@@ -143,6 +163,16 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
     )
     prediction_output.insert(0, "actual", y_test.reset_index(drop=True))
     prediction_output.to_csv(predictions_path, index=False)
+
+    residuals = pd.DataFrame(
+        {
+            "actual": y_test.reset_index(drop=True),
+            "predicted": pd.Series(model_predictions),
+        }
+    )
+    residuals["residual"] = residuals["predicted"] - residuals["actual"]
+    residuals["absolute_error"] = residuals["residual"].abs()
+    residuals.to_csv(residuals_path, index=False)
 
     return metrics
 
