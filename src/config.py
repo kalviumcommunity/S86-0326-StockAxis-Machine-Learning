@@ -12,10 +12,11 @@ class Config:
     project_root: Path = field(default_factory=lambda: Path(__file__).resolve().parents[1])
     data_path: Path = field(default_factory=lambda: Path("data/raw/dataset.csv"))
     processed_data_path: Path = field(default_factory=lambda: Path("data/processed/cleaned_dataset.csv"))
-    model_path: Path = field(default_factory=lambda: Path("models/random_forest_model.joblib"))
+    model_path: Path = field(default_factory=lambda: Path("models/linear_regression_model.joblib"))
     pipeline_path: Path = field(default_factory=lambda: Path("models/preprocessing_pipeline.joblib"))
     metrics_path: Path = field(default_factory=lambda: Path("reports/metrics.json"))
     predictions_path: Path = field(default_factory=lambda: Path("reports/predictions.csv"))
+    coefficients_path: Path = field(default_factory=lambda: Path("reports/coefficients.csv"))
 
     target_column: str = "target"
     test_size: float = 0.2
@@ -23,18 +24,17 @@ class Config:
 
     model_params: dict[str, Any] = field(
         default_factory=lambda: {
-            "n_estimators": 200,
-            "max_depth": None,
-            "min_samples_split": 2,
-            "min_samples_leaf": 1,
+            "fit_intercept": True,
+            "positive": False,
         }
     )
 
     categorical_columns: list[str] = field(default_factory=list)
     numerical_columns: list[str] = field(default_factory=list)
     drop_columns: list[str] = field(default_factory=list)
-    numerical_scaler: str = "minmax"
-    baseline_strategy: str = "most_frequent"
+    numerical_scaler: str = "standard"
+    baseline_strategy: str = "mean"
+    cv_folds: int = 5
 
     def resolve_path(self, path_like: Path) -> Path:
         """Resolve project-relative paths to absolute paths."""

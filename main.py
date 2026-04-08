@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import json
 
-from src.baseline import evaluate_classification_baseline
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import cross_val_score
+from sklearn.pipeline import Pipeline
+
+from src.baseline import evaluate_regression_baseline
 from src.config import Config
 from src.data_loader import load_data
 from src.data_preprocessing import clean_data, split_data
@@ -29,6 +34,7 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
     pipeline_path = config.resolve_path(config.pipeline_path)
     metrics_path = config.resolve_path(config.metrics_path)
     predictions_path = config.resolve_path(config.predictions_path)
+    coefficients_path = config.resolve_path(config.coefficients_path)
 
     df_raw = load_data(raw_data_path)
     df_clean = clean_data(df_raw)
@@ -66,7 +72,7 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
         model_params=config.model_params,
     )
 
-    baseline_metrics = evaluate_classification_baseline(
+    baseline_metrics = evaluate_regression_baseline(
         X_train=X_train_processed,
         y_train=y_train,
         X_test=X_test_processed,
@@ -84,9 +90,45 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
     for metric_name, metric_value in model_metrics.items():
         metrics[f"model_{metric_name}"] = float(metric_value)
 
+    lower_is_better = {"mse", "rmse", "mae"}
+    higher_is_better = {"r2"}
+
     for metric_name, metric_value in model_metrics.items():
-        if metric_name in baseline_metrics:
+        if metric_name in baseline_metrics and metric_name in lower_is_better:
+            metrics[f"improvement_{metric_name}"] = float(baseline_metrics[metric_name] - metric_value)
+        elif metric_name in baseline_metrics and metric_name in higher_is_better:
             metrics[f"improvement_{metric_name}"] = float(metric_value - baseline_metrics[metric_name])
+
+    cv_pipeline = Pipeline(
+        steps=[
+            (
+                "preprocessor",
+                build_preprocessing_pipeline(
+                    categorical_cols=categorical_cols,
+                    numerical_cols=numerical_cols,
+                    numerical_scaler=config.numerical_scaler,
+                ),
+            ),
+            ("model", LinearRegression(**config.model_params)),
+        ]
+    )
+    cv_r2_scores = cross_val_score(cv_pipeline, X_train, y_train, cv=config.cv_folds, scoring="r2")
+    metrics["cv_r2_mean"] = float(cv_r2_scores.mean())
+    metrics["cv_r2_std"] = float(cv_r2_scores.std())
+    for fold_index, fold_score in enumerate(cv_r2_scores, start=1):
+        metrics[f"cv_r2_fold_{fold_index}"] = float(fold_score)
+
+    feature_names = fitted_preprocessor.get_feature_names_out()
+    coefficients = pd.DataFrame(
+        {
+            "feature": feature_names,
+            "coefficient": model.coef_,
+        }
+    )
+    coefficients["abs_coefficient"] = coefficients["coefficient"].abs()
+    coefficients = coefficients.sort_values("abs_coefficient", ascending=False)
+    coefficients.to_csv(coefficients_path, index=False)
+    metrics["model_intercept"] = float(model.intercept_)
 
     save_artifacts(model=model, pipeline=fitted_preprocessor, model_path=model_path, pipeline_path=pipeline_path)
 
