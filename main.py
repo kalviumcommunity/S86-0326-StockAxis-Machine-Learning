@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 
 import pandas as pd
 from sklearn.linear_model import LinearRegression
@@ -137,6 +138,26 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
     metrics["cv_mae_std"] = float(cv_mae_scores.std())
     for fold_index, fold_score in enumerate(cv_mae_scores, start=1):
         metrics[f"cv_mae_fold_{fold_index}"] = float(fold_score)
+
+    cv_neg_mse_scores = cross_val_score(
+        cv_pipeline,
+        X_train,
+        y_train,
+        cv=config.cv_folds,
+        scoring="neg_mean_squared_error",
+    )
+    cv_mse_scores = -cv_neg_mse_scores
+    metrics["cv_mse_mean"] = float(cv_mse_scores.mean())
+    metrics["cv_mse_std"] = float(cv_mse_scores.std())
+    for fold_index, fold_score in enumerate(cv_mse_scores, start=1):
+        metrics[f"cv_mse_fold_{fold_index}"] = float(fold_score)
+
+    cv_rmse_scores = [math.sqrt(score) for score in cv_mse_scores]
+    metrics["cv_rmse_mean"] = float(sum(cv_rmse_scores) / len(cv_rmse_scores))
+    rmse_variance = sum((score - metrics["cv_rmse_mean"]) ** 2 for score in cv_rmse_scores) / len(cv_rmse_scores)
+    metrics["cv_rmse_std"] = float(math.sqrt(rmse_variance))
+    for fold_index, fold_score in enumerate(cv_rmse_scores, start=1):
+        metrics[f"cv_rmse_fold_{fold_index}"] = float(fold_score)
 
     feature_names = fitted_preprocessor.get_feature_names_out()
     coefficients = pd.DataFrame(
