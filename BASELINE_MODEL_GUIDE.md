@@ -42,7 +42,7 @@ Never inspect test labels to design heuristic rules.
 
 ## Project Implementation
 
-This repository now includes classification baseline evaluation in the training pipeline.
+This repository now includes regression baseline evaluation in the training pipeline.
 
 - Baseline logic: [src/baseline.py](src/baseline.py)
 - Baseline configuration: [src/config.py](src/config.py)
@@ -52,12 +52,12 @@ Config option:
 
 - `baseline_strategy` in [src/config.py](src/config.py)
 
-Supported strategies are those accepted by scikit-learn DummyClassifier, including:
+Supported strategies are those accepted by scikit-learn DummyRegressor, including:
 
-- `most_frequent`
-- `stratified`
-- `uniform`
-- `prior`
+- `mean`
+- `median`
+- `quantile`
+- `constant`
 
 ## Metrics Output
 
@@ -66,6 +66,14 @@ The metrics report includes three groups:
 - `baseline_*` metrics
 - `model_*` metrics
 - `improvement_*` metrics where:
+
+For error metrics where lower is better (MSE, RMSE, MAE):
+
+$$
+improvement = baseline - model
+$$
+
+For R2 where higher is better:
 
 $$
 improvement = model - baseline
@@ -79,9 +87,9 @@ When reporting results, include both absolute values and deltas.
 
 Example style:
 
-- Baseline F1: 0.65
-- Model F1: 0.79
-- Improvement: +0.14
+- Baseline RMSE: 18.43
+- Model RMSE: 9.17
+- Improvement: +9.26
 
 This is far more informative than reporting only model accuracy.
 

@@ -153,10 +153,11 @@ python main.py
 After execution, the pipeline writes:
 
 - `data/processed/cleaned_dataset.csv`
-- `models/random_forest_model.joblib`
+- `models/linear_regression_model.joblib`
 - `models/preprocessing_pipeline.joblib`
 - `reports/metrics.json`
 - `reports/predictions.csv`
+- `reports/coefficients.csv`
 
 ## Learning Guides
 
@@ -170,6 +171,7 @@ After execution, the pipeline writes:
 - `SCALING_NUMERICAL_FEATURES_GUIDE.md`
 - `MINMAX_NORMALIZATION_GUIDE.md`
 - `BASELINE_MODEL_GUIDE.md`
+- `LINEAR_REGRESSION_MODEL_GUIDE.md`
 - `notebooks/understanding_data_leakage_simple_examples.ipynb`
 - `notebooks/selecting_numerical_and_categorical_features.ipynb`
 
