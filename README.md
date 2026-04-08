@@ -158,6 +158,7 @@ After execution, the pipeline writes:
 - `reports/metrics.json`
 - `reports/predictions.csv`
 - `reports/coefficients.csv`
+- `reports/residuals.csv`
 
 ## Learning Guides
 
@@ -172,6 +173,7 @@ After execution, the pipeline writes:
 - `MINMAX_NORMALIZATION_GUIDE.md`
 - `BASELINE_MODEL_GUIDE.md`
 - `LINEAR_REGRESSION_MODEL_GUIDE.md`
+- `MAE_EVALUATION_GUIDE.md`
 - `notebooks/understanding_data_leakage_simple_examples.ipynb`
 - `notebooks/selecting_numerical_and_categorical_features.ipynb`
 
