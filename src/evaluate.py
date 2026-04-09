@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import (
     accuracy_score,
+    balanced_accuracy_score,
     f1_score,
     mean_absolute_error,
     mean_squared_error,
@@ -52,6 +53,7 @@ def evaluate_model(
 
     metrics = {
         "accuracy": float(accuracy_score(y_test, predictions)),
+        "balanced_accuracy": float(balanced_accuracy_score(y_test, predictions)),
         "precision": float(precision_score(y_test, predictions, average=average_mode, zero_division=0)),
         "recall": float(recall_score(y_test, predictions, average=average_mode, zero_division=0)),
         "f1": float(f1_score(y_test, predictions, average=average_mode, zero_division=0)),

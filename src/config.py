@@ -19,6 +19,7 @@ class Config:
     coefficients_path: Path = field(default_factory=lambda: Path("reports/coefficients.csv"))
     residuals_path: Path = field(default_factory=lambda: Path("reports/residuals.csv"))
     classification_report_path: Path = field(default_factory=lambda: Path("reports/classification_report.txt"))
+    confusion_matrix_path: Path = field(default_factory=lambda: Path("reports/confusion_matrix.csv"))
 
     problem_type: str = "regression"
     target_column: str = "target"

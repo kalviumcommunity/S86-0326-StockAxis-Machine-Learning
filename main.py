@@ -6,7 +6,7 @@ import math
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import KFold, StratifiedKFold, cross_val_score
 from sklearn.pipeline import Pipeline
 
@@ -45,6 +45,7 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
     coefficients_path = config.resolve_path(config.coefficients_path)
     residuals_path = config.resolve_path(config.residuals_path)
     classification_report_path = config.resolve_path(config.classification_report_path)
+    confusion_matrix_path = config.resolve_path(config.confusion_matrix_path)
 
     df_raw = load_data(raw_data_path)
     df_clean = clean_data(df_raw)
@@ -192,7 +193,7 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
         for fold_index, fold_score in enumerate(cv_rmse_scores, start=1):
             metrics[f"cv_rmse_fold_{fold_index}"] = float(fold_score)
     else:
-        higher_is_better = {"accuracy", "precision", "recall", "f1", "roc_auc"}
+        higher_is_better = {"accuracy", "balanced_accuracy", "precision", "recall", "f1", "roc_auc"}
         for metric_name, metric_value in model_metrics.items():
             if metric_name in baseline_metrics and metric_name in higher_is_better:
                 metrics[f"improvement_{metric_name}"] = float(metric_value - baseline_metrics[metric_name])
@@ -224,6 +225,24 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
         metrics["cv_roc_auc_std"] = float(cv_auc_scores.std())
         for fold_index, fold_score in enumerate(cv_auc_scores, start=1):
             metrics[f"cv_roc_auc_fold_{fold_index}"] = float(fold_score)
+
+        cv_accuracy_scores = cross_val_score(cv_pipeline, X_train, y_train, cv=cv_splitter, scoring="accuracy")
+        metrics["cv_accuracy_mean"] = float(cv_accuracy_scores.mean())
+        metrics["cv_accuracy_std"] = float(cv_accuracy_scores.std())
+        for fold_index, fold_score in enumerate(cv_accuracy_scores, start=1):
+            metrics[f"cv_accuracy_fold_{fold_index}"] = float(fold_score)
+
+        cv_balanced_accuracy_scores = cross_val_score(
+            cv_pipeline,
+            X_train,
+            y_train,
+            cv=cv_splitter,
+            scoring="balanced_accuracy",
+        )
+        metrics["cv_balanced_accuracy_mean"] = float(cv_balanced_accuracy_scores.mean())
+        metrics["cv_balanced_accuracy_std"] = float(cv_balanced_accuracy_scores.std())
+        for fold_index, fold_score in enumerate(cv_balanced_accuracy_scores, start=1):
+            metrics[f"cv_balanced_accuracy_fold_{fold_index}"] = float(fold_score)
 
         cv_f1_scores = cross_val_score(cv_pipeline, X_train, y_train, cv=cv_splitter, scoring=f1_scoring)
         metrics["cv_f1_mean"] = float(cv_f1_scores.mean())
@@ -314,6 +333,12 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
         report_text = classification_report(y_test, model_predictions, zero_division=0)
         with open(classification_report_path, "w", encoding="utf-8") as report_file:
             report_file.write(report_text)
+
+        labels = sorted(pd.unique(pd.concat([y_test, pd.Series(model_predictions)])))
+        cm = confusion_matrix(y_test, model_predictions, labels=labels)
+        confusion_matrix_df = pd.DataFrame(cm, index=[f"actual_{label}" for label in labels])
+        confusion_matrix_df.columns = [f"predicted_{label}" for label in labels]
+        confusion_matrix_df.to_csv(confusion_matrix_path)
 
     return metrics
 
