@@ -6,7 +6,16 @@ import math
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import (
+    accuracy_score,
+    balanced_accuracy_score,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_recall_curve,
+    precision_score,
+    recall_score,
+)
 from sklearn.model_selection import KFold, StratifiedKFold, cross_val_score
 from sklearn.pipeline import Pipeline
 
@@ -46,6 +55,7 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
     residuals_path = config.resolve_path(config.residuals_path)
     classification_report_path = config.resolve_path(config.classification_report_path)
     confusion_matrix_path = config.resolve_path(config.confusion_matrix_path)
+    precision_recall_curve_path = config.resolve_path(config.precision_recall_curve_path)
 
     df_raw = load_data(raw_data_path)
     df_clean = clean_data(df_raw)
@@ -116,6 +126,7 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
         problem_type=problem_type,
     )
     model_predictions = model.predict(X_test_processed)
+    threshold_predictions = None
 
     metrics: dict[str, float] = {}
     for metric_name, metric_value in baseline_metrics.items():
@@ -250,6 +261,66 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
         for fold_index, fold_score in enumerate(cv_f1_scores, start=1):
             metrics[f"cv_f1_fold_{fold_index}"] = float(fold_score)
 
+        cv_precision_scores = cross_val_score(cv_pipeline, X_train, y_train, cv=cv_splitter, scoring="precision_weighted")
+        metrics["cv_precision_mean"] = float(cv_precision_scores.mean())
+        metrics["cv_precision_std"] = float(cv_precision_scores.std())
+        for fold_index, fold_score in enumerate(cv_precision_scores, start=1):
+            metrics[f"cv_precision_fold_{fold_index}"] = float(fold_score)
+
+        cv_recall_scores = cross_val_score(cv_pipeline, X_train, y_train, cv=cv_splitter, scoring="recall_weighted")
+        metrics["cv_recall_mean"] = float(cv_recall_scores.mean())
+        metrics["cv_recall_std"] = float(cv_recall_scores.std())
+        for fold_index, fold_score in enumerate(cv_recall_scores, start=1):
+            metrics[f"cv_recall_fold_{fold_index}"] = float(fold_score)
+
+        if y_train.nunique() == 2 and hasattr(model, "predict_proba"):
+            if not 0 < config.classification_threshold < 1:
+                raise ValueError("classification_threshold must be between 0 and 1.")
+
+            classes = list(model.classes_)
+            positive_label = classes[1]
+            negative_label = classes[0]
+            positive_index = classes.index(positive_label)
+
+            y_prob = model.predict_proba(X_test_processed)[:, positive_index]
+            threshold_predictions = np.where(y_prob >= config.classification_threshold, positive_label, negative_label)
+
+            metrics["classification_threshold"] = float(config.classification_threshold)
+            metrics["model_precision_at_threshold"] = float(
+                precision_score(y_test, threshold_predictions, pos_label=positive_label, zero_division=0)
+            )
+            metrics["model_recall_at_threshold"] = float(
+                recall_score(y_test, threshold_predictions, pos_label=positive_label, zero_division=0)
+            )
+            metrics["model_f1_at_threshold"] = float(
+                f1_score(y_test, threshold_predictions, pos_label=positive_label, zero_division=0)
+            )
+            metrics["model_accuracy_at_threshold"] = float(accuracy_score(y_test, threshold_predictions))
+            metrics["model_balanced_accuracy_at_threshold"] = float(
+                balanced_accuracy_score(y_test, threshold_predictions)
+            )
+
+            pr_precisions, pr_recalls, pr_thresholds = precision_recall_curve(y_test, y_prob, pos_label=positive_label)
+            pr_curve_df = pd.DataFrame(
+                {
+                    "threshold": np.append(pr_thresholds, np.nan),
+                    "precision": pr_precisions,
+                    "recall": pr_recalls,
+                }
+            )
+            pr_curve_df.to_csv(precision_recall_curve_path, index=False)
+
+            if config.target_recall is not None:
+                if not 0 <= config.target_recall <= 1:
+                    raise ValueError("target_recall must be between 0 and 1 when provided.")
+
+                valid_idx = np.where(pr_recalls[:-1] >= config.target_recall)[0]
+                if len(valid_idx) > 0:
+                    best_idx = valid_idx[np.argmax(pr_precisions[:-1][valid_idx])]
+                    metrics["target_recall"] = float(config.target_recall)
+                    metrics["best_threshold_for_target_recall"] = float(pr_thresholds[best_idx])
+                    metrics["best_precision_for_target_recall"] = float(pr_precisions[best_idx])
+
     feature_names = fitted_preprocessor.get_feature_names_out()
     if problem_type == "regression":
         coefficients = pd.DataFrame(
@@ -306,6 +377,8 @@ def run_training_pipeline(config: Config) -> dict[str, float]:
         pipeline=fitted_preprocessor,
         expected_columns=X_train.columns.tolist(),
     )
+    if threshold_predictions is not None:
+        prediction_output["prediction_thresholded"] = threshold_predictions
     prediction_output.insert(0, "actual", y_test.reset_index(drop=True))
     prediction_output.to_csv(predictions_path, index=False)
 

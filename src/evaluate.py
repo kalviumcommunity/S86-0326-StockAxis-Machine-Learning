@@ -50,20 +50,58 @@ def evaluate_model(
     unique_labels = np.unique(y_test)
     is_binary = len(unique_labels) == 2
     average_mode = "binary" if is_binary else "weighted"
+    positive_label = unique_labels[-1] if is_binary else None
 
-    metrics = {
-        "accuracy": float(accuracy_score(y_test, predictions)),
-        "balanced_accuracy": float(balanced_accuracy_score(y_test, predictions)),
-        "precision": float(precision_score(y_test, predictions, average=average_mode, zero_division=0)),
-        "recall": float(recall_score(y_test, predictions, average=average_mode, zero_division=0)),
-        "f1": float(f1_score(y_test, predictions, average=average_mode, zero_division=0)),
-    }
+    if is_binary:
+        metrics = {
+            "accuracy": float(accuracy_score(y_test, predictions)),
+            "balanced_accuracy": float(balanced_accuracy_score(y_test, predictions)),
+            "precision": float(
+                precision_score(
+                    y_test,
+                    predictions,
+                    average=average_mode,
+                    pos_label=positive_label,
+                    zero_division=0,
+                )
+            ),
+            "recall": float(
+                recall_score(
+                    y_test,
+                    predictions,
+                    average=average_mode,
+                    pos_label=positive_label,
+                    zero_division=0,
+                )
+            ),
+            "f1": float(
+                f1_score(
+                    y_test,
+                    predictions,
+                    average=average_mode,
+                    pos_label=positive_label,
+                    zero_division=0,
+                )
+            ),
+        }
+    else:
+        metrics = {
+            "accuracy": float(accuracy_score(y_test, predictions)),
+            "balanced_accuracy": float(balanced_accuracy_score(y_test, predictions)),
+            "precision": float(precision_score(y_test, predictions, average=average_mode, zero_division=0)),
+            "recall": float(recall_score(y_test, predictions, average=average_mode, zero_division=0)),
+            "f1": float(f1_score(y_test, predictions, average=average_mode, zero_division=0)),
+        }
 
     if hasattr(model, "predict_proba"):
         probabilities = model.predict_proba(X_test)
         try:
             if is_binary:
-                metrics["roc_auc"] = float(roc_auc_score(y_test, probabilities[:, 1]))
+                if hasattr(model, "classes_"):
+                    positive_index = list(model.classes_).index(positive_label)
+                else:
+                    positive_index = 1
+                metrics["roc_auc"] = float(roc_auc_score(y_test, probabilities[:, positive_index]))
             else:
                 metrics["roc_auc"] = float(
                     roc_auc_score(y_test, probabilities, multi_class="ovr", average="weighted")

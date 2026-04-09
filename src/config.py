@@ -20,6 +20,7 @@ class Config:
     residuals_path: Path = field(default_factory=lambda: Path("reports/residuals.csv"))
     classification_report_path: Path = field(default_factory=lambda: Path("reports/classification_report.txt"))
     confusion_matrix_path: Path = field(default_factory=lambda: Path("reports/confusion_matrix.csv"))
+    precision_recall_curve_path: Path = field(default_factory=lambda: Path("reports/precision_recall_curve.csv"))
 
     problem_type: str = "regression"
     target_column: str = "target"
@@ -34,6 +35,8 @@ class Config:
     numerical_scaler: str = "standard"
     baseline_strategy: str = "mean"
     cv_folds: int = 5
+    classification_threshold: float = 0.5
+    target_recall: float | None = None
 
     def resolve_path(self, path_like: Path) -> Path:
         """Resolve project-relative paths to absolute paths."""
