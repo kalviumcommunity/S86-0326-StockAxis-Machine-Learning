@@ -18,17 +18,14 @@ class Config:
     predictions_path: Path = field(default_factory=lambda: Path("reports/predictions.csv"))
     coefficients_path: Path = field(default_factory=lambda: Path("reports/coefficients.csv"))
     residuals_path: Path = field(default_factory=lambda: Path("reports/residuals.csv"))
+    classification_report_path: Path = field(default_factory=lambda: Path("reports/classification_report.txt"))
 
+    problem_type: str = "regression"
     target_column: str = "target"
     test_size: float = 0.2
     random_state: int = 42
 
-    model_params: dict[str, Any] = field(
-        default_factory=lambda: {
-            "fit_intercept": True,
-            "positive": False,
-        }
-    )
+    model_params: dict[str, Any] = field(default_factory=dict)
 
     categorical_columns: list[str] = field(default_factory=list)
     numerical_columns: list[str] = field(default_factory=list)
