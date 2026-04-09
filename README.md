@@ -163,6 +163,7 @@ After execution, the pipeline writes:
 - `reports/coefficients.csv`
 - `reports/residuals.csv`
 - `reports/classification_report.txt` (classification mode)
+- `reports/confusion_matrix.csv` (classification mode)
 
 ## Learning Guides
 
@@ -180,6 +181,7 @@ After execution, the pipeline writes:
 - `LOGISTIC_REGRESSION_MODEL_GUIDE.md`
 - `MAE_EVALUATION_GUIDE.md`
 - `MSE_R2_EVALUATION_GUIDE.md`
+- `ACCURACY_EVALUATION_GUIDE.md`
 - `notebooks/understanding_data_leakage_simple_examples.ipynb`
 - `notebooks/selecting_numerical_and_categorical_features.ipynb`
 
