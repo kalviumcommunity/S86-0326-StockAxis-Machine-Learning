@@ -164,6 +164,7 @@ After execution, the pipeline writes:
 - `reports/residuals.csv`
 - `reports/classification_report.txt` (classification mode)
 - `reports/confusion_matrix.csv` (classification mode)
+- `reports/precision_recall_curve.csv` (binary classification mode)
 
 ## Learning Guides
 
@@ -182,6 +183,7 @@ After execution, the pipeline writes:
 - `MAE_EVALUATION_GUIDE.md`
 - `MSE_R2_EVALUATION_GUIDE.md`
 - `ACCURACY_EVALUATION_GUIDE.md`
+- `PRECISION_RECALL_EVALUATION_GUIDE.md`
 - `notebooks/understanding_data_leakage_simple_examples.ipynb`
 - `notebooks/selecting_numerical_and_categorical_features.ipynb`
 
