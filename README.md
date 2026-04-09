@@ -148,17 +148,21 @@ For sprint-grade reproducibility, rebuild from a clean environment before submis
 python main.py
 ```
 
+To run classification with Logistic Regression, set `problem_type = "classification"` in `src/config.py`.
+
 ## Outputs
 
 After execution, the pipeline writes:
 
 - `data/processed/cleaned_dataset.csv`
-- `models/linear_regression_model.joblib`
+- `models/linear_regression_model.joblib` (regression mode)
+- `models/logistic_regression_model.joblib` (classification mode)
 - `models/preprocessing_pipeline.joblib`
 - `reports/metrics.json`
 - `reports/predictions.csv`
 - `reports/coefficients.csv`
 - `reports/residuals.csv`
+- `reports/classification_report.txt` (classification mode)
 
 ## Learning Guides
 
@@ -173,6 +177,7 @@ After execution, the pipeline writes:
 - `MINMAX_NORMALIZATION_GUIDE.md`
 - `BASELINE_MODEL_GUIDE.md`
 - `LINEAR_REGRESSION_MODEL_GUIDE.md`
+- `LOGISTIC_REGRESSION_MODEL_GUIDE.md`
 - `MAE_EVALUATION_GUIDE.md`
 - `MSE_R2_EVALUATION_GUIDE.md`
 - `notebooks/understanding_data_leakage_simple_examples.ipynb`
