@@ -185,6 +185,7 @@ After execution, the pipeline writes:
 - `ACCURACY_EVALUATION_GUIDE.md`
 - `PRECISION_RECALL_EVALUATION_GUIDE.md`
 - `F1_EVALUATION_GUIDE.md`
+- `CONFUSION_MATRIX_EVALUATION_GUIDE.md`
 - `notebooks/understanding_data_leakage_simple_examples.ipynb`
 - `notebooks/selecting_numerical_and_categorical_features.ipynb`
 
