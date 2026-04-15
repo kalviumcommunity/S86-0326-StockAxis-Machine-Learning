@@ -294,6 +294,8 @@ Strategies for managing cost:
 
 ## RandomizedSearchCV as a Practical Alternative
 
+For a full lesson on sampling-based tuning, see [RANDOMIZED_SEARCH_CV_GUIDE.md](RANDOMIZED_SEARCH_CV_GUIDE.md).
+
 RandomizedSearchCV samples a fixed number of configurations instead of evaluating the full Cartesian product.
 
 ```python

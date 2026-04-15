@@ -188,6 +188,7 @@ After execution, the pipeline writes:
 - `F1_EVALUATION_GUIDE.md`
 - `CONFUSION_MATRIX_EVALUATION_GUIDE.md`
 - `GRID_SEARCH_CV_GUIDE.md`
+- `RANDOMIZED_SEARCH_CV_GUIDE.md`
 - `notebooks/understanding_data_leakage_simple_examples.ipynb`
 - `notebooks/selecting_numerical_and_categorical_features.ipynb`
 
