@@ -150,6 +150,8 @@ Use this only as a starting point, then validate with cross-validation.
 
 ## Select K with Cross-Validation
 
+For a full explanation of hyperparameter tuning mechanics, scoring choices, leakage prevention, and search strategy, see [GRID_SEARCH_CV_GUIDE.md](GRID_SEARCH_CV_GUIDE.md).
+
 ```python
 import matplotlib.pyplot as plt
 from sklearn.model_selection import GridSearchCV
